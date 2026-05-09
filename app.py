@@ -39,6 +39,8 @@ def init_state() -> None:
     ss.setdefault("history", [])
     ss.setdefault("selected_fft_points", [])
     ss.setdefault("fft_click_key_version", 0)
+    ss.setdefault("selected_crop_points", [])
+    ss.setdefault("crop_click_key_version", 0)
     ss.setdefault("last_uploaded_hash", None)
 
 
@@ -67,8 +69,20 @@ def _reset() -> None:
     ss.working_image_rgb = ss.original_image_rgb.copy()
     ss.preview_image_rgb = ss.original_image_rgb.copy()
     ss.selected_fft_points = []
+    ss.selected_crop_points = []
     ss.fft_click_key_version += 1
 
+def _reset() -> None:
+    ss = st.session_state
+    if ss.original_image_rgb is None:
+        return
+    ss.history = []
+    ss.working_image_rgb = ss.original_image_rgb.copy()
+    ss.preview_image_rgb = ss.original_image_rgb.copy()
+    ss.selected_fft_points = []
+    ss.selected_crop_points = []
+    ss.fft_click_key_version += 1
+    ss.crop_click_key_version += 1
 
 def _clear_fft_points() -> None:
     st.session_state.selected_fft_points = []
@@ -135,6 +149,9 @@ def main() -> None:
     init_state()
 
     ss = st.session_state
+    if "selected_crop_points" not in ss:
+        ss.selected_crop_points = []
+
     working: Optional[np.ndarray] = ss.working_image_rgb
     info: Optional[ImageInfo] = get_image_info(working) if working is not None else None
 
@@ -452,7 +469,29 @@ def main() -> None:
             cfg = controls.edit_controls(image_shape=(h, w))
 
             if cfg.tool == "crop":
-                preview = editing.crop(img, x1=cfg.x1, y1=cfg.y1, x2=cfg.x2, y2=cfg.y2)
+                crop_pts = list(ss.selected_crop_points)
+                crop_pts, last = controls.click_two_points_on_image(
+                    img,
+                    key=f"crop_clicks_{ss.crop_click_key_version}",
+                    existing_points=crop_pts
+                )
+                ss.selected_crop_points = crop_pts
+                st.write(f"Crop points: {crop_pts}")
+                if len(crop_pts) == 2:
+                    (yA, xA), (yB, xB) = crop_pts
+                    x1 = min(xA, xB)
+                    y1 = min(yA, yB)
+                    x2 = max(xA, xB)
+                    y2 = max(yA, yB)
+                    preview = editing.crop(
+                        img,
+                        x1=x1,
+                        y1=y1,
+                        x2=x2,
+                        y2=y2
+                    )
+                else:
+                    preview = img.copy()
             elif cfg.tool == "rotate":
                 preview = editing.rotate(img, angle_deg=cfg.angle, keep_size=cfg.keep_size)
             elif cfg.tool == "resize":
