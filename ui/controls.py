@@ -88,7 +88,7 @@ def fourier_controls() -> FourierControls:
 
 @dataclass(frozen=True)
 class NoiseControls:
-    kind: Literal["salt & pepper", "periodic"]
+    kind: Literal["salt_pepper", "periodic"]
     sp_amount: float
     sp_ratio: float
     per_freq: float
@@ -98,13 +98,13 @@ class NoiseControls:
 
 def noise_controls() -> NoiseControls:
     st.markdown("### Add Noise")
-    kind = st.selectbox("Noise type", ["salt & pepper", "periodic"], index=0)
+    kind = st.selectbox("Noise type", ["salt_pepper", "periodic"], index=0)
     sp_amount = 0.03
     sp_ratio = 0.5
     per_freq = 8.0
     per_amp = 35.0
     per_orient = 45.0
-    if kind == "salt & pepper":
+    if kind == "salt_pepper":
         sp_amount = float(st.slider("Noise amount", min_value=0.0, max_value=0.25, value=0.03, step=0.005))
         sp_ratio = float(st.slider("Salt vs pepper", min_value=0.0, max_value=1.0, value=0.5, step=0.05))
     else:
@@ -123,7 +123,7 @@ def noise_controls() -> NoiseControls:
 
 @dataclass(frozen=True)
 class DenoiseControls:
-    method: Literal["median", "notch (auto)", "band reject (auto)", "mask (manual)"]
+    method: Literal["median", "notch_auto", "band_reject_auto", "mask_click"]
     median_ksize: int
     notch_sigma: float
     peak_min_dist: int
@@ -136,7 +136,7 @@ class DenoiseControls:
 
 def denoise_controls() -> DenoiseControls:
     st.markdown("### Noise Removal")
-    method = st.selectbox("Method", ["median", "notch (auto)", "band reject (auto)", "mask (manual)"], index=0)
+    method = st.selectbox("Method", ["median", "notch_auto", "band_reject_auto", "mask_click"], index=0)
     median_ksize = 3
     notch_sigma = 6.0
     peak_min_dist = 12
@@ -148,12 +148,12 @@ def denoise_controls() -> DenoiseControls:
 
     if method == "median":
         median_ksize = int(st.slider("Median kernel (odd)", min_value=3, max_value=21, value=3, step=2))
-    elif method == "notch (auto)":
+    elif method == "notch_auto":
         notch_sigma = float(st.slider("Notch sigma", min_value=2.0, max_value=20.0, value=6.0, step=0.5))
         peak_min_dist = int(st.slider("Peak min distance", min_value=6, max_value=40, value=12, step=1))
         peak_thr = float(st.slider("Peak threshold (rel)", min_value=0.05, max_value=0.9, value=0.35, step=0.01))
         max_peaks = int(st.slider("Max peaks", min_value=4, max_value=40, value=16, step=1))
-    elif method == "band reject (auto)":
+    elif method == "band_reject_auto":
         band_bw = float(st.slider("Bandwidth", min_value=2.0, max_value=60.0, value=10.0, step=1.0))
         peak_min_dist = int(st.slider("Peak min distance", min_value=6, max_value=40, value=12, step=1))
         peak_thr = float(st.slider("Peak threshold (rel)", min_value=0.05, max_value=0.9, value=0.35, step=0.01))
@@ -177,7 +177,7 @@ def denoise_controls() -> DenoiseControls:
 
 @dataclass(frozen=True)
 class EditControls:
-    tool: Literal["crop", "rotate", "resize", "brightness & contrast"]
+    tool: Literal["crop", "rotate", "resize", "brightness_contrast"]
     x1: int
     y1: int
     x2: int
@@ -194,7 +194,7 @@ class EditControls:
 def edit_controls(*, image_shape: Tuple[int, int]) -> EditControls:
     h, w = int(image_shape[0]), int(image_shape[1])
     st.markdown("### Image Editing")
-    tool = st.selectbox("Tool", ["crop", "rotate", "resize", "brightness & contrast"], index=0)
+    tool = st.selectbox("Tool", ["crop", "rotate", "resize", "brightness_contrast"], index=0)
 
     x1 = 0
     y1 = 0

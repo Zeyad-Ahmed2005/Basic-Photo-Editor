@@ -325,7 +325,7 @@ def main() -> None:
             cfg = controls.noise_controls()
             img = ss.working_image_rgb
             assert img is not None
-            if cfg.kind == "salt & pepper":
+            if cfg.kind == "salt_pepper":
                 preview = noise.add_salt_and_pepper(img, amount=cfg.sp_amount, salt_vs_pepper=cfg.sp_ratio)
                 label = "Salt & pepper noise"
             else:
