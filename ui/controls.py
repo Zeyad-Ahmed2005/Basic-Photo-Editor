@@ -209,13 +209,7 @@ def edit_controls(*, image_shape: Tuple[int, int]) -> EditControls:
     contrast = 1.0
 
     if tool == "crop":
-        col1, col2 = st.columns(2)
-        with col1:
-            x1 = int(st.slider("x1", 0, max(0, w - 1), 0, 1))
-            x2 = int(st.slider("x2", 1, w, w, 1))
-        with col2:
-            y1 = int(st.slider("y1", 0, max(0, h - 1), 0, 1))
-            y2 = int(st.slider("y2", 1, h, h, 1))
+        x1, y1, x2, y2 = 0, 0, w, h
     elif tool == "rotate":
         angle = float(st.slider("Angle (deg)", -180.0, 180.0, 0.0, 1.0))
         keep_size = bool(st.checkbox("Keep same size", value=True))
@@ -287,3 +281,39 @@ def click_two_points_on_spectrum(
             pts.append((y, x))
     return pts, last
 
+def click_two_points_on_image(
+    image,
+    *,
+    key,
+    existing_points=None,
+):
+    points = existing_points or []
+
+    if image is None or not isinstance(image, np.ndarray) or image.size == 0:
+        return points, None
+    
+    pil = Image.fromarray(image.astype(np.uint8), mode="RGB")
+
+    render_w = 700
+    click = streamlit_image_coordinates(pil, key=key, width=render_w)
+    last = None
+    pts = list(existing_points)
+
+    if click is not None and "x" in click and "y" in click:
+        orig_h, orig_w = image.shape[0], image.shape[1]
+        rendered_w = int(render_w)
+        rendered_h = int(round(orig_h * (rendered_w / float(orig_w))))
+
+        x_r = float(click["x"])
+        y_r = float(click["y"])
+        x = int(round(x_r * (orig_w / float(rendered_w))))
+        y = int(round(y_r * (orig_h / float(rendered_h))))
+
+        x = max(0, min(orig_w - 1, x))
+        y = max(0, min(orig_h - 1, y))
+
+        last = (y, x)
+        if len(pts) < 2:
+            pts.append((y, x))
+
+    return pts, last
