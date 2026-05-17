@@ -137,7 +137,7 @@ flowchart TD
   A[RGB working image] --> B[Grayscale]
   B --> C[2D FFT]
   C --> D[fftshift — DC at center]
-  D --> E[Magnitude |F|]
+  D --> E["Magnitude |F|"]
   E --> F[log1p for display range]
   F --> G[Normalize to 0–255]
   G --> H[Log-magnitude spectrum image]
