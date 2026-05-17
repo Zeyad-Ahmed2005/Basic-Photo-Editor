@@ -50,7 +50,7 @@ flowchart LR
 **Upload** — load and normalize the file.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[Image file JPG/PNG/BMP] --> B[PIL decode bytes]
   B --> C[EXIF auto-rotate]
   C --> D[Convert to RGB]
@@ -61,7 +61,7 @@ flowchart TD
 **Histogram view** (Upload page) — intensity distribution of the working image.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB working image] --> B[Grayscale via BT.601 luma]
   B --> C[Count pixels per intensity 0–255]
   C --> D[Grayscale histogram plot]
@@ -76,7 +76,7 @@ flowchart TD
 Redistributes pixel intensities so the histogram is flatter — this **improves contrast automatically** (different from the manual **Brightness / contrast** slider on the Image Editing page). Color images only equalize **luminance**, not hue.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[Input image] --> B{Grayscale or color?}
   B -->|Grayscale| C[OpenCV equalizeHist]
   C --> Z[Equalized image]
@@ -100,7 +100,7 @@ Both filters run on **grayscale**, then the result is shown as a gray RGB previe
 **Sobel** — horizontal, vertical, or gradient magnitude edges.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB input] --> B[Convert to grayscale]
   B --> C{Direction}
   C -->|X| D[Sobel ∂/∂x]
@@ -117,7 +117,7 @@ flowchart TD
 **Laplacian** — second-derivative / sharpness emphasis.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB input] --> B[Convert to grayscale]
   B --> C[Laplacian kernel convolve]
   C --> D[Absolute value]
@@ -133,7 +133,7 @@ flowchart TD
 Shows **where** frequency energy lives in the image (no image change).
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB working image] --> B[Grayscale]
   B --> C[2D FFT]
   C --> D[fftshift — DC at center]
@@ -150,7 +150,7 @@ flowchart TD
 **Salt & pepper** — random impulse noise (white/black pixels).
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB image] --> B[Pick random pixel locations]
   B --> C{Per pixel}
   C -->|Salt fraction| D[Set RGB = 255 white]
@@ -162,7 +162,7 @@ flowchart TD
 **Periodic noise** — sinusoidal pattern overlaid on the image.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB image] --> B[Build 2D sine wave]
   B --> C["pattern = A·sin(2πf·projection)"]
   C --> D[Add pattern to all channels]
@@ -178,7 +178,7 @@ flowchart TD
 **Median filter** — best for **salt & pepper** (spatial domain).
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB noisy image] --> B[For each channel R, G, B]
   B --> C[Median filter k×k window]
   C --> D[Replace pixel with neighborhood median]
@@ -188,7 +188,7 @@ flowchart TD
 **Automatic notch filter** — removes **periodic** noise via frequency peaks.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB input] --> B[Grayscale]
   B --> C[FFT → shifted spectrum]
   C --> D[Suppress DC center blob]
@@ -204,7 +204,7 @@ flowchart TD
 **Automatic band-reject** — rejects whole **rings** of radius around the spectrum center.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB input] --> B[Grayscale]
   B --> C[FFT + peak detection same as notch]
   C --> D[Compute radius of each peak from center]
@@ -216,7 +216,7 @@ flowchart TD
 **Interactive mask (2 clicks)** — you pick two points on the spectrum.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[User clicks 2 points on spectrum] --> B[Mirror each point through center]
   B --> C[Hard circular masks at 4 locations]
   C --> D[Soften with Gaussian notch blend]
@@ -252,7 +252,7 @@ flowchart LR
 **Rotate**
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB image] --> B[Rotation matrix around center]
   B --> C{Keep original size?}
   C -->|Yes| D[warpAffine same W×H]
@@ -264,7 +264,7 @@ flowchart TD
 **Resize**
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB image] --> B{Keep aspect ratio?}
   B -->|Yes| C[Fit inside target W×H box]
   B -->|No| D[Stretch to exact W×H]
@@ -285,7 +285,7 @@ Manual adjustment on every RGB channel using a linear formula (see `core/editing
 | **Brightness** | −255 – 255 (default 0) | Shifts all intensities up or down after scaling. |
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[RGB input uint8] --> B[Convert to float32]
   B --> C[For each channel R, G, B]
   C --> D["Multiply by contrast factor"]
@@ -325,7 +325,7 @@ flowchart LR
 #### 8. Undo, reset, download
 
 ```mermaid
-flowchart TD
+flowchart LR
   A[Apply changes] --> B[Push copy to history stack]
   B --> C[Working image updated]
   D[Undo] --> E[Pop history → restore previous working image]
